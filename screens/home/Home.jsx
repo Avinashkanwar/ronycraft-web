@@ -33,7 +33,15 @@ const Home = () => {
     };
 
     return (
-        <div className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] min-h-screen">
+        <div className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] min-h-screen relative">
+            <div className="absolute top-6 right-8">
+                <button
+                    onClick={() => navigate('/login')}
+                    className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-2 rounded-full font-medium hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                >
+                    Login
+                </button>
+            </div>
             <section className="flex flex-col items-center justify-center min-h-[45vh] text-white text-center px-8 pt-12 pb-4">
                 <div className="hero max-w-4xl mx-auto">
                     <h1 className="font-sans text-6xl mb-4 font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
