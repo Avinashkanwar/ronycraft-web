@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@theme {
+    --color-rony-navy: #1A2D42;
+    --color-rony-orange: #D36B31;
+    --color-rony-sand: #F5EFE6;
+    --color-rony-light: #FAFAFA;
+    --color-rony-stone: #E7E5E4;
+    --color-rony-text: #333333;
+}
