@@ -35,7 +35,7 @@ const ShippingInfo = () => {
     return (
         <div className="bg-rony-stone min-h-screen">
             {/* Navbar */}
-            <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md z-50 border-b border-gray-200">
+            <nav className="fixed top-0 left-0 right-0  backdrop-blur-md z-50 border-b border-gray-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20">
                         <div className="flex-shrink-0 flex items-center gap-3">

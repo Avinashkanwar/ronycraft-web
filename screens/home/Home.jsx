@@ -20,20 +20,28 @@ const Home = () => {
     return (
         <div className="bg-rony-stone min-h-screen font-sans text-rony-text">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-rony-stone/95 backdrop-blur-md px-4 md:px-8 lg:px-12 py-4 flex justify-between items-center border-b border-gray-200/50 shadow-sm">
+            <header className="sticky top-0 z-50 bg-rony-stone/95 backdrop-blur-md px-4 md:px-8 lg:px-12 py-4 flex justify-between items-center border-b border-gray-300">
                 <div className="flex items-center gap-3">
                     <img src={logo} alt="RonyCraft Logo" className="h-10 w-auto rounded-full" />
                     <div className="flex flex-col">
                         <span className="font-bold text-xl tracking-tight text-rony-navy leading-tight">RonyCraft</span>
-                        <span className="text-[10px] text-gray-500 font-medium tracking-wide hidden sm:block">Handcrafted excellence</span>
+                        <span className="text-[10px] text-gray-500 font-medium tracking-wide hidden sm:block">Carry Your World With Style</span>
                     </div>
                 </div>
-                <button
-                    onClick={() => navigate('/login')}
-                    className="bg-rony-navy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
-                >
-                    Login
-                </button>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => navigate('/about')}
+                        className="text-rony-navy font-medium hover:text-rony-orange transition-colors text-sm"
+                    >
+                        About
+                    </button>
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="bg-rony-navy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
+                    >
+                        Login
+                    </button>
+                </div>
             </header>
 
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -58,12 +66,8 @@ const Home = () => {
 
                     {/* Center Section - Search & Products */}
                     <div className="lg:col-span-9 space-y-6">
-                        <div className="text-center mb-8">
-                            <h1 className="text-2xl font-bold text-rony-navy mb-2">Welcome to RonyCraft</h1>
-                            <p className="text-gray-500 text-sm">Discover our handcrafted collection</p>
-                        </div>
-                        {/* Search Input */}
-                        <div className="relative group max-w-md mx-auto">
+                        {/* Search Input - Mobile Only (Moved Top) */}
+                        <div className="relative group max-w-md mx-auto lg:hidden mb-8">
                             <input
                                 type="text"
                                 placeholder="Search for bags..."
@@ -74,6 +78,17 @@ const Home = () => {
                             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-rony-navy transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
+                        </div>
+
+                        <div className="text-center mb-12 relative">
+                            <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent -z-10"></div>
+                            <span className="bg-rony-stone px-4 text-xs font-bold text-rony-orange uppercase tracking-[0.2em] mb-2 inline-block">Premium Collection</span>
+                            <h1 className="text-3xl md:text-4xl font-bold text-rony-navy mb-3 tracking-tight">
+                                RonyCraft  <span className="text-transparent bg-clip-text bg-gradient-to-r from-rony-navy to-rony-orange">Carry Your World</span>
+                            </h1>
+                            <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
+                                Discover our curated selection of premium bags, designed for the modern adventurer and professional.
+                            </p>
                         </div>
 
                         {/* Mobile Category Filter */}
@@ -95,39 +110,77 @@ const Home = () => {
                         </div>
 
                         {/* Bags Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10 mt-8">
                             {filteredBags.map((bag) => (
                                 <div
                                     key={bag.id}
-                                    className="group cursor-pointer bg-white rounded-xl p-2 transition-all duration-300"
+                                    className="group cursor-pointer flex flex-col"
                                     onClick={() => navigate(`/bag/${bag.id}`)}
                                 >
-                                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-100 mb-3">
+                                    <div className="relative aspect-square overflow-hidden bg-[#F5F5F5] mb-3 rounded-2xl group-hover:shadow-lg transition-all duration-500">
                                         {bag.originalPrice && (
-                                            <div className="absolute top-2 right-2 z-10 bg-red-500 text-white px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">
-                                                Sale
+                                            <div className="absolute top-0 left-0 z-10 bg-[#D93F3F] text-white px-2 py-1 text-[10px] font-bold">
+                                                SALE
                                             </div>
                                         )}
-                                        <img
-                                            src={bag.image}
-                                            alt={bag.name}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                        />
+
+                                        {/* Combo Card Layout */}
+                                        {bag.category === 'Combo' && bag.images && bag.images.length > 1 ? (
+                                            <div className="w-full h-full grid grid-cols-2 grid-rows-2 gap-0.5">
+                                                {bag.images.slice(0, 4).map((img, index) => (
+                                                    <div key={index} className={`relative overflow-hidden ${bag.images.length === 2 ? 'row-span-2' : ''} ${bag.images.length === 3 && index === 0 ? 'row-span-2' : ''}`}>
+                                                        <img
+                                                            src={img}
+                                                            alt={`${bag.name} ${index + 1}`}
+                                                            className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-110"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            /* Standard Card Layout */
+                                            <img
+                                                src={bag.image}
+                                                alt={bag.name}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 mix-blend-multiply"
+                                            />
+                                        )}
+
+                                        {/* Quick Action Overlay */}
+                                        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex justify-center">
+                                            <button className="bg-white/90 backdrop-blur-sm text-rony-navy px-4 py-2 rounded-full text-xs font-bold shadow-lg hover:bg-rony-navy hover:text-white transition-colors">
+                                                View Details
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <div className="px-1">
-                                        <div className="flex justify-between items-start mb-1">
-                                            <h3 className="text-sm font-bold text-rony-navy group-hover:text-rony-orange transition-colors line-clamp-1">
-                                                {bag.name}
-                                            </h3>
-                                        </div>
-                                        <div className="flex items-baseline gap-2 mb-1">
-                                            <span className="font-bold text-rony-navy text-lg">{bag.price}</span>
-                                            {bag.originalPrice && (
-                                                <span className="text-xs text-gray-400 line-through decoration-gray-400">{bag.originalPrice}</span>
+                                    <div className="space-y-1">
+                                        <div className="flex justify-between items-start">
+                                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                                                {bag.category}
+                                            </p>
+                                            {bag.rating && (
+                                                <div className="flex items-center gap-1">
+                                                    <svg className="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                    <span className="text-xs font-bold text-gray-700">{bag.rating}</span>
+                                                    <span className="text-[10px] text-gray-400">({bag.reviews})</span>
+                                                </div>
                                             )}
                                         </div>
-                                        <p className="text-xs text-gray-500">{bag.category}</p>
+
+                                        <div className="flex justify-between items-start gap-2">
+                                            <h3 className="text-sm font-bold text-gray-800 leading-tight group-hover:text-rony-navy transition-colors line-clamp-2">
+                                                {bag.name}
+                                            </h3>
+                                            <div className="flex flex-col items-end shrink-0">
+                                                <span className="text-sm font-bold text-[#D93F3F]">{bag.price}</span>
+                                                {bag.originalPrice && (
+                                                    <span className="text-[10px] text-gray-400 line-through">{bag.originalPrice}</span>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -156,10 +209,43 @@ const Home = () => {
 
                     {/* Right Section - Empty for balance */}
                     <div className="lg:col-span-1 hidden lg:block"></div>
-
-
-
                 </div>
+
+                {/* Features Section */}
+                <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-gray-200 pt-12">
+                    <div className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm">
+                        <div className="w-12 h-12 bg-rony-navy/10 rounded-full flex items-center justify-center mb-4 text-rony-navy">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h3 className="font-bold text-rony-navy mb-2">Premium Quality</h3>
+                        <p className="text-sm text-gray-500">Handcrafted using the finest materials for lasting durability.</p>
+                    </div>
+                    <div className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm">
+                        <div className="w-12 h-12 bg-rony-orange/10 rounded-full flex items-center justify-center mb-4 text-rony-orange">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 className="font-bold text-rony-navy mb-2">Fast Shipping</h3>
+                        <p className="text-sm text-gray-500">Quick and secure delivery to your doorstep worldwide.</p>
+                    </div>
+                    <div className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm">
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 className="font-bold text-rony-navy mb-2">24/7 Support</h3>
+                        <p className="text-sm text-gray-500">Dedicated support team ready to assist you anytime.</p>
+                    </div>
+                </div>
+
+
+
+
+
             </div>
         </div>
     );
