@@ -1,26 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { bags } from '../data/bags';
+import toast from 'react-hot-toast';
 import logo from '../../src/assets/ronycraft_logo.jpg';
 
 const BagDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart, bookNow } = useCart();
-    const [notification, setNotification] = useState('');
 
     // Find the bag from the centralized data
     const bag = bags.find(b => b.id === parseInt(id)) || bags[0];
 
-    const showNotification = (message) => {
-        setNotification(message);
-        setTimeout(() => setNotification(''), 3000);
-    };
-
     const handleAddToCart = () => {
         addToCart(bag);
-        navigate('/shipping', { state: { bag } });
+        toast.success('Added to cart!', {
+            icon: '🛒',
+        });
+        navigate('/cart');
     };
 
     const handleBookNow = () => {
@@ -29,13 +27,6 @@ const BagDetail = () => {
 
     return (
         <div className="bg-white min-h-screen font-sans text-rony-text">
-            {/* Notification Toast */}
-            {notification && (
-                <div className="fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
-                    {notification}
-                </div>
-            )}
-
             {/* Simple Header with Logo Left */}
             <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

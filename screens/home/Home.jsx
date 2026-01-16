@@ -211,36 +211,6 @@ const Home = () => {
                     <div className="lg:col-span-1 hidden lg:block"></div>
                 </div>
 
-                {/* Features Section */}
-                <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-gray-200 pt-12">
-                    <div className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm">
-                        <div className="w-12 h-12 bg-rony-navy/10 rounded-full flex items-center justify-center mb-4 text-rony-navy">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <h3 className="font-bold text-rony-navy mb-2">Premium Quality</h3>
-                        <p className="text-sm text-gray-500">Handcrafted using the finest materials for lasting durability.</p>
-                    </div>
-                    <div className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm">
-                        <div className="w-12 h-12 bg-rony-orange/10 rounded-full flex items-center justify-center mb-4 text-rony-orange">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h3 className="font-bold text-rony-navy mb-2">Fast Shipping</h3>
-                        <p className="text-sm text-gray-500">Quick and secure delivery to your doorstep worldwide.</p>
-                    </div>
-                    <div className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h3 className="font-bold text-rony-navy mb-2">24/7 Support</h3>
-                        <p className="text-sm text-gray-500">Dedicated support team ready to assist you anytime.</p>
-                    </div>
-                </div>
 
 
 

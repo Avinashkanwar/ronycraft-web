@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import ToastProvider from './components/ToastProvider';
 import AppRoutes from '../routes';
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
     <Router>
       <CartProvider>
         <AppRoutes />
+        <ToastProvider />
       </CartProvider>
     </Router>
   );

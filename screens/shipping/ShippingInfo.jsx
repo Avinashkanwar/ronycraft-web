@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useCart } from '../../src/context/CartContext';
 import logo from '../../src/assets/ronycraft_logo.jpg';
 
 const ShippingInfo = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { cartItems, getCartTotal, clearCart } = useCart();
     const bagData = location.state?.bag || null;
 
     const [formData, setFormData] = useState({
@@ -29,13 +31,27 @@ const ShippingInfo = () => {
         e.preventDefault();
         // Show success message
         alert('Order placed successfully! We will contact you soon.');
+        if (!bagData) {
+            clearCart();
+        }
         navigate('/');
     };
+
+    const calculateTotal = () => {
+        if (bagData) {
+            return parseFloat(bagData.price.replace('$', ''));
+        }
+        return getCartTotal();
+    };
+
+    const totalAmount = calculateTotal();
+    const tax = totalAmount * 0.1;
+    const finalTotal = totalAmount + tax;
 
     return (
         <div className="bg-rony-stone min-h-screen">
             {/* Navbar */}
-            <nav className="fixed top-0 left-0 right-0  backdrop-blur-md z-50 border-b border-gray-300">
+            <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md z-50 border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20">
                         <div className="flex-shrink-0 flex items-center gap-3">
@@ -224,49 +240,60 @@ const ShippingInfo = () => {
 
                         {/* Order Summary */}
                         <div className="lg:col-span-1">
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 sticky top-24">
-                                <h3 className="text-lg font-bold text-rony-navy mb-4">Order Summary</h3>
+                            <div className="sticky top-24">
+                                <h3 className="text-xl font-bold text-rony-navy mb-6">Order Summary</h3>
 
-                                {bagData ? (
-                                    <>
-                                        <div className="mb-4">
+                                <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                                    {bagData ? (
+                                        <div className="flex gap-4 items-center">
                                             <img
                                                 src={bagData.image}
                                                 alt={bagData.name}
-                                                className="w-full h-32 object-cover rounded-lg mb-3"
+                                                className="w-16 h-16 object-cover rounded-lg"
                                             />
-                                            <h4 className="font-bold text-rony-navy">{bagData.name}</h4>
-                                            <p className="text-sm text-gray-500 mt-1">{bagData.category}</p>
+                                            <div>
+                                                <h4 className="font-bold text-rony-navy text-sm">{bagData.name}</h4>
+                                                <p className="text-xs text-gray-500">{bagData.category}</p>
+                                                <p className="text-sm font-semibold mt-1">{bagData.price}</p>
+                                            </div>
                                         </div>
-                                        <div className="border-t border-gray-200 pt-4 space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-600">Price</span>
-                                                <span className="font-medium">{bagData.price}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-600">Shipping</span>
-                                                <span className="font-medium text-green-600">Free</span>
-                                            </div>
-                                            <div className="border-t border-gray-200 pt-2 mt-2">
-                                                <div className="flex justify-between">
-                                                    <span className="font-bold text-rony-navy">Total</span>
-                                                    <span className="font-bold text-rony-navy text-lg">{bagData.price}</span>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {cartItems.map((item) => (
+                                                <div key={item.id} className="flex gap-4 items-center">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-14 h-14 object-cover rounded-lg"
+                                                    />
+                                                    <div className="flex-1">
+                                                        <h4 className="font-bold text-sm text-rony-navy line-clamp-1">{item.name}</h4>
+                                                        <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                                                    </div>
+                                                    <p className="text-sm font-semibold">{item.price}</p>
                                                 </div>
-                                            </div>
+                                            ))}
                                         </div>
-                                    </>
-                                ) : (
-                                    <p className="text-gray-500 text-sm">No item selected</p>
-                                )}
+                                    )}
+                                </div>
 
-                                <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                                    <div className="flex items-start gap-2">
-                                        <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <div>
-                                            <p className="text-sm font-medium text-green-800">Free Shipping</p>
-                                            <p className="text-xs text-green-600 mt-1">Delivery in 3-5 business days</p>
+                                <div className="space-y-3 px-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Subtotal</span>
+                                        <span className="font-medium">${totalAmount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Tax (10%)</span>
+                                        <span className="font-medium">${tax.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Shipping</span>
+                                        <span className="font-medium text-green-600">Free</span>
+                                    </div>
+                                    <div className="border-t border-gray-200 pt-3 mt-3">
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-bold text-rony-navy">Total</span>
+                                            <span className="font-bold text-rony-navy text-xl">${finalTotal.toFixed(2)}</span>
                                         </div>
                                     </div>
                                 </div>
