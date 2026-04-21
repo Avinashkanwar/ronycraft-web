@@ -5,6 +5,7 @@ import BagDetail from '../src/components/BagDetail';
 import Cart from '../src/components/cart/Cart';
 import Login from '../screens/login/Login';
 import ShippingInfo from '../screens/shipping/ShippingInfo';
+import Contact from '../screens/contact/Contact';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 
@@ -18,6 +19,7 @@ const AppRoutes = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/shipping" element={<ShippingInfo />} />
+                <Route path="/contact" element={<Contact />} />
             </Route>
         </Routes>
     );

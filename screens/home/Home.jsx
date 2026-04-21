@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../src/assets/ronycraft_logo.jpg';
 import { bags, categories } from '../../src/data/bags';
@@ -15,25 +15,36 @@ const Home = () => {
         return matchesCategory && matchesSearch;
     });
 
+    const scrollToCategories = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
 
 
     return (
         <div className="bg-rony-stone min-h-screen font-sans text-rony-text">
             {/* Header */}
             <header className="sticky top-0 z-50 bg-rony-stone/95 backdrop-blur-md px-4 md:px-8 lg:px-12 py-4 flex justify-between items-center border-b border-gray-200/50 shadow-sm">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
                     <img src={logo} alt="RonyCraft Logo" className="h-10 w-auto rounded-full" />
                     <div className="flex flex-col">
                         <span className="font-bold text-xl tracking-tight text-rony-navy leading-tight">RonyCraft</span>
                         <span className="text-[10px] text-gray-500 font-medium tracking-wide hidden sm:block">Handcrafted excellence</span>
                     </div>
                 </div>
-                <button
-                    onClick={() => navigate('/login')}
-                    className="bg-rony-navy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
-                >
-                    Login
-                </button>
+
+                <div className="flex items-center gap-6">
+                    <nav className="hidden md:flex items-center gap-8 mr-4">
+                        <button onClick={scrollToCategories} className="text-sm font-medium text-gray-600 hover:text-rony-navy transition-colors cursor-pointer">Categories</button>
+                        <button onClick={() => navigate('/contact')} className="text-sm font-medium text-gray-600 hover:text-rony-navy transition-colors cursor-pointer">Contact Us</button>
+                    </nav>
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="bg-rony-navy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
+                    >
+                        Login
+                    </button>
+                </div>
             </header>
 
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -54,6 +65,15 @@ const Home = () => {
                                 <span>{cat.name}</span>
                             </button>
                         ))}
+                        <button
+                            onClick={() => navigate('/contact')}
+                            className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex justify-between items-center text-gray-600 hover:bg-white hover:text-rony-navy border-t border-gray-100 mt-2"
+                        >
+                            <span>Contact Us</span>
+                            <svg className="w-4 h-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
+                            </svg>
+                        </button>
                     </div>
 
                     {/* Center Section - Search & Products */}
@@ -91,6 +111,12 @@ const Home = () => {
                                         {cat.name}
                                     </button>
                                 ))}
+                                <button
+                                    onClick={() => navigate('/contact')}
+                                    className="px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap bg-white text-gray-600 border border-gray-100"
+                                >
+                                    Contact Us
+                                </button>
                             </div>
                         </div>
 
