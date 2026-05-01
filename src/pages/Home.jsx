@@ -1,53 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getProducts } from '../api';
 
 const Home = () => {
     const navigate = useNavigate();
+    const [bags, setBags] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const bags = [
-        {
-            id: 1,
-            name: "The Executive",
-            price: "$129.99",
-            image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            category: "Business"
-        },
-        {
-            id: 2,
-            name: "Urban Explorer",
-            price: "$89.99",
-            image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            category: "Casual"
-        },
-        {
-            id: 3,
-            name: "Weekend Getaway",
-            price: "$149.99",
-            image: "https://images.unsplash.com/photo-1559563458-527698bf5295?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            category: "Travel"
-        },
-        {
-            id: 4,
-            name: "Leather Satchel",
-            price: "$179.99",
-            image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            category: "Professional"
-        },
-        {
-            id: 5,
-            name: "Sport Duffle",
-            price: "$109.99",
-            image: "https://images.unsplash.com/photo-1564859228273-274232fdb516?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            category: "Athletic"
-        },
-        {
-            id: 6,
-            name: "Laptop Backpack",
-            price: "$95.99",
-            image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            category: "Tech"
-        }
-    ];
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await getProducts();
+                // Depending on the API response structure, it might be response.data or response.data.results
+                setBags(response.data.results || response.data);
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     return (
         <div className="bg-rony-stone min-h-screen">
@@ -67,12 +41,18 @@ const Home = () => {
 
             <section className="py-8 md:py-12 lg:py-16 px-4 md:px-8 max-w-7xl mx-auto">
                 <h2 className="text-2xl md:text-3xl font-bold text-rony-navy mb-8 md:mb-12 text-center">Featured Collection</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-                    {bags.map((bag) => (
-                        <div
-                            key={bag.id}
-                            className="group bg-rony-light border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-rony-orange"
-                        >
+                {loading ? (
+                    <div className="flex justify-center items-center min-h-[200px]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rony-navy"></div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                        {bags.map((bag) => (
+                            <div
+                                key={bag.id}
+                                className="group bg-rony-light border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-rony-orange cursor-pointer"
+                                onClick={() => navigate(`/product/${bag.id}`)}
+                            >
                             <div className="h-48 sm:h-56 md:h-64 overflow-hidden">
                                 <img
                                     src={bag.image}
@@ -81,7 +61,7 @@ const Home = () => {
                                 />
                             </div>
                             <div className="p-4 md:p-6">
-                                <div className="text-xs font-semibold text-rony-orange mb-2 uppercase tracking-wider">{bag.category}</div>
+                                <div className="text-xs font-semibold text-rony-orange mb-2 uppercase tracking-wider">{bag.category?.name || bag.category}</div>
                                 <h3 className="text-lg md:text-xl font-bold text-rony-navy mb-2">{bag.name}</h3>
                                 <div className="flex items-center justify-between mt-4">
                                     <span className="text-xl md:text-2xl font-bold text-rony-navy">{bag.price}</span>
@@ -90,7 +70,7 @@ const Home = () => {
                             </div>
                         </div>
                     ))}
-                </div>
+                )}
             </section>
         </div>
     );

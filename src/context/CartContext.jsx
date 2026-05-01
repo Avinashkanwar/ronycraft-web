@@ -1,4 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+    getCart, 
+    addToCart as addToCartApi, 
+    updateCartItem as updateCartItemApi, 
+    removeCartItem as removeCartItemApi, 
+    clearCart as clearCartApi 
+} from '../api';
+import { v4 as uuidv4 } from 'uuid';
 
 const CartContext = createContext();
 
@@ -11,10 +19,15 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState(() => {
-        // Load cart from localStorage on initial load
-        const savedCart = localStorage.getItem('ronycraftCart');
-        return savedCart ? JSON.parse(savedCart) : [];
+    const [cartItems, setCartItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [sessionId, setSessionId] = useState(() => {
+        let id = localStorage.getItem('ronycraftSessionId');
+        if (!id) {
+            id = uuidv4();
+            localStorage.setItem('ronycraftSessionId', id);
+        }
+        return id;
     });
 
     const [bookings, setBookings] = useState(() => {
@@ -22,45 +35,65 @@ export const CartProvider = ({ children }) => {
         return savedBookings ? JSON.parse(savedBookings) : [];
     });
 
-    // Save cart to localStorage whenever it changes
+    // Fetch cart from API on initial load
     useEffect(() => {
-        localStorage.setItem('ronycraftCart', JSON.stringify(cartItems));
-    }, [cartItems]);
+        const fetchCart = async () => {
+            try {
+                const response = await getCart(sessionId);
+                setCartItems(response.data.items || []);
+            } catch (error) {
+                console.error("Error fetching cart:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCart();
+    }, [sessionId]);
 
     useEffect(() => {
         localStorage.setItem('ronycraftBookings', JSON.stringify(bookings));
     }, [bookings]);
 
-    const addToCart = (item) => {
-        setCartItems(prev => {
-            const existingItem = prev.find(i => i.id === item.id);
-            if (existingItem) {
-                return prev.map(i =>
-                    i.id === item.id
-                        ? { ...i, quantity: i.quantity + 1 }
-                        : i
-                );
-            }
-            return [...prev, { ...item, quantity: 1 }];
-        });
+    const addToCart = async (product) => {
+        try {
+            const response = await addToCartApi(sessionId, {
+                product_id: product.id,
+                quantity: 1
+            });
+            // Update cart items from response
+            const updatedCart = await getCart(sessionId);
+            setCartItems(updatedCart.data.items);
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+        }
     };
 
-    const removeFromCart = (itemId) => {
-        setCartItems(prev => prev.filter(item => item.id !== itemId));
+    const removeFromCart = async (itemId) => {
+        try {
+            await removeCartItemApi(sessionId, { product_id: itemId });
+            const updatedCart = await getCart(sessionId);
+            setCartItems(updatedCart.data.items);
+        } catch (error) {
+            console.error("Error removing from cart:", error);
+        }
     };
 
-    const updateQuantity = (itemId, quantity) => {
+    const updateQuantity = async (itemId, quantity) => {
         if (quantity <= 0) {
             removeFromCart(itemId);
             return;
         }
-        setCartItems(prev =>
-            prev.map(item =>
-                item.id === itemId
-                    ? { ...item, quantity }
-                    : item
-            )
-        );
+        try {
+            await updateCartItemApi(sessionId, {
+                product_id: itemId,
+                quantity: quantity
+            });
+            const updatedCart = await getCart(sessionId);
+            setCartItems(updatedCart.data.items);
+        } catch (error) {
+            console.error("Error updating quantity:", error);
+        }
     };
 
     const bookNow = (item) => {
@@ -74,13 +107,20 @@ export const CartProvider = ({ children }) => {
         return booking;
     };
 
-    const clearCart = () => {
-        setCartItems([]);
+    const clearCart = async () => {
+        try {
+            await clearCartApi(sessionId);
+            setCartItems([]);
+        } catch (error) {
+            console.error("Error clearing cart:", error);
+        }
     };
 
     const getCartTotal = () => {
+        // Assuming the backend provides the total, or we calculate it from items
+        // The items from backend might have price_at_addition or similar
         return cartItems.reduce((total, item) => {
-            const price = parseFloat(item.price.replace('$', ''));
+            const price = parseFloat(item.product.price);
             return total + (price * item.quantity);
         }, 0);
     };
@@ -92,6 +132,7 @@ export const CartProvider = ({ children }) => {
     const value = {
         cartItems,
         bookings,
+        loading,
         addToCart,
         removeFromCart,
         updateQuantity,

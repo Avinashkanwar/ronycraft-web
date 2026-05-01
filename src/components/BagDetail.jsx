@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { bags } from '../data/bags';
+import { getProductDetail } from '../api';
 import logo from '../../src/assets/ronycraft_logo.jpg';
 
 const BagDetail = () => {
@@ -9,9 +9,23 @@ const BagDetail = () => {
     const navigate = useNavigate();
     const { addToCart, bookNow } = useCart();
     const [notification, setNotification] = useState('');
+    const [bag, setBag] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Find the bag from the centralized data
-    const bag = bags.find(b => b.id === parseInt(id)) || bags[0];
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const response = await getProductDetail(id);
+                setBag(response.data);
+            } catch (error) {
+                console.error("Error fetching product:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProduct();
+    }, [id]);
 
     const showNotification = (message) => {
         setNotification(message);
@@ -56,78 +70,89 @@ const BagDetail = () => {
             </nav>
 
             <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    {/* Left: Images */}
-                    <div className="space-y-4">
-                        <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
-                            <img
-                                src={bag.images[0]}
-                                alt={bag.name}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <div className="grid grid-cols-3 gap-4">
-                            {bag.images.map((img, idx) => (
-                                <div key={idx} className="aspect-square rounded-xl overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img src={img} alt="" className="w-full h-full object-cover" />
-                                </div>
-                            ))}
-                        </div>
+                {loading ? (
+                    <div className="flex justify-center items-center min-h-[400px]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rony-navy"></div>
                     </div>
-
-                    {/* Right: Details */}
-                    <div className="flex flex-col justify-center">
-                        <div className="mb-2">
-                            <span className="text-rony-orange font-semibold tracking-wider uppercase text-sm">{bag.category}</span>
-                        </div>
-                        <h1 className="text-4xl font-bold text-rony-navy mb-4">{bag.name}</h1>
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="flex items-baseline gap-3">
-                                <span className="text-3xl font-bold text-rony-navy">{bag.price}</span>
-                                {bag.originalPrice && (
-                                    <span className="text-xl text-gray-400 line-through decoration-gray-400">{bag.originalPrice}</span>
-                                )}
+                ) : !bag ? (
+                    <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-rony-navy">Product not found</h2>
+                        <button onClick={() => navigate('/')} className="mt-4 text-rony-orange font-semibold">Back to Home</button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {/* Left: Images */}
+                        <div className="space-y-4">
+                            <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
+                                <img
+                                    src={bag.image || (bag.images && bag.images[0])}
+                                    alt={bag.name}
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
-                            <div className="flex items-center gap-1 text-yellow-500">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                                <span className="text-gray-400 text-sm ml-1">({bag.reviews} reviews)</span>
-                            </div>
-                        </div>
-
-                        <p className="text-gray-600 text-lg leading-relaxed mb-8">
-                            {bag.description}
-                        </p>
-
-                        <div className="mb-8">
-                            <h3 className="font-bold text-rony-navy mb-3">Key Features</h3>
-                            <ul className="space-y-2">
-                                {bag.features.map((feature, idx) => (
-                                    <li key={idx} className="flex items-center gap-3 text-gray-600">
-                                        <svg className="h-5 w-5 text-rony-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        {feature}
-                                    </li>
+                            <div className="grid grid-cols-3 gap-4">
+                                {(bag.images || [bag.image]).map((img, idx) => (
+                                    <div key={idx} className="aspect-square rounded-xl overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity">
+                                        <img src={img} alt="" className="w-full h-full object-cover" />
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
 
-                        <div className="flex gap-4">
-                            <button
-                                onClick={handleAddToCart}
-                                className="flex-1 bg-rony-navy text-white py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all shadow-lg hover:shadow-xl cursor-pointer"
-                            >
-                                Add to Cart
-                            </button>
-                            <button
-                                onClick={handleBookNow}
-                                className="flex-1 border-2 border-rony-orange text-rony-orange py-4 rounded-xl font-bold text-lg hover:bg-rony-orange hover:text-white transition-all shadow-lg hover:shadow-xl cursor-pointer"
-                            >
-                                Book Now
-                            </button>
+                        {/* Right: Details */}
+                        <div className="flex flex-col justify-center">
+                            <div className="mb-2">
+                                <span className="text-rony-orange font-semibold tracking-wider uppercase text-sm">{bag.category?.name || bag.category}</span>
+                            </div>
+                            <h1 className="text-4xl font-bold text-rony-navy mb-4">{bag.name}</h1>
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="flex items-baseline gap-3">
+                                    <span className="text-3xl font-bold text-rony-navy">${bag.price}</span>
+                                    {bag.originalPrice && (
+                                        <span className="text-xl text-gray-400 line-through decoration-gray-400">${bag.originalPrice}</span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-1 text-yellow-500">
+                                    <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                                    <span className="text-gray-400 text-sm ml-1">({bag.reviews || 0} reviews)</span>
+                                </div>
+                            </div>
+
+                            <p className="text-gray-600 text-lg leading-relaxed mb-8">
+                                {bag.description}
+                            </p>
+
+                            <div className="mb-8">
+                                <h3 className="font-bold text-rony-navy mb-3">Key Features</h3>
+                                <ul className="space-y-2">
+                                    {(bag.features || []).map((feature, idx) => (
+                                        <li key={idx} className="flex items-center gap-3 text-gray-600">
+                                            <svg className="h-5 w-5 text-rony-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="flex-1 bg-rony-navy text-white py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all shadow-lg hover:shadow-xl cursor-pointer"
+                                >
+                                    Add to Cart
+                                </button>
+                                <button
+                                    onClick={handleBookNow}
+                                    className="flex-1 border-2 border-rony-orange text-rony-orange py-4 rounded-xl font-bold text-lg hover:bg-rony-orange hover:text-white transition-all shadow-lg hover:shadow-xl cursor-pointer"
+                                >
+                                    Book Now
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

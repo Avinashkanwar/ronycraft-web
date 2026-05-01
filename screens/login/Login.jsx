@@ -1,10 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import loginImage from '../../src/assets/login.png';
 import logo from '../../src/assets/ronycraft_logo.jpg';
+import { login } from '../../src/api';
 
 const Login = () => {
     const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await login({ username: email, password }); // Django often uses 'username'
+            localStorage.setItem('token', response.data.token);
+            navigate('/');
+        } catch (err) {
+            console.error("Login error:", err);
+            setError(err.response?.data?.error || 'Invalid credentials. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-rony-stone p-4">
             <div className="w-full max-w-4xl bg-rony-light rounded-xl md:rounded-2xl border border-gray-200 overflow-hidden flex flex-col md:flex-row">
@@ -28,6 +51,12 @@ const Login = () => {
                     <h2 className="text-2xl md:text-3xl font-bold text-rony-navy mb-2">Welcome Back</h2>
                     <p className="text-sm md:text-base text-rony-text mb-6 md:mb-8">Sign in to continue shopping</p>
 
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6 text-sm">
+                            {error}
+                        </div>
+                    )}
+
                     <button className="w-full flex items-center justify-center gap-3 bg-rony-navy text-white font-medium py-2.5 md:py-3 text-sm md:text-base rounded-lg hover:bg-opacity-90 transition-colors mb-4 md:mb-6 cursor-pointer border border-rony-navy">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
                         Sign in with Google
@@ -42,13 +71,16 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <form className="space-y-4 md:space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/home'); }}>
+                    <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label className="block text-sm font-medium text-rony-text mb-2">Email Address</label>
                             <input
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base rounded-lg bg-white border border-gray-300 text-rony-text placeholder-gray-500 focus:outline-none focus:border-rony-navy focus:ring-1 focus:ring-rony-navy transition-colors"
                                 placeholder="john@example.com"
+                                required
                             />
                         </div>
 
@@ -56,16 +88,25 @@ const Login = () => {
                             <label className="block text-sm font-medium text-rony-text mb-2">Password</label>
                             <input
                                 type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base rounded-lg bg-white border border-gray-300 text-rony-text placeholder-gray-500 focus:outline-none focus:border-rony-navy focus:ring-1 focus:ring-rony-navy transition-colors"
                                 placeholder="••••••••"
+                                required
                             />
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full bg-rony-navy text-white font-semibold py-2.5 md:py-3 text-sm md:text-base rounded-lg hover:bg-opacity-90 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+                            disabled={loading}
+                            className={`w-full bg-rony-navy text-white font-semibold py-2.5 md:py-3 text-sm md:text-base rounded-lg hover:bg-opacity-90 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer flex justify-center items-center ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                            Log In
+                            {loading ? (
+                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            ) : 'Log In'}
                         </button>
                     </form>
                 </div>

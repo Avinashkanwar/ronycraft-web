@@ -84,19 +84,19 @@ const Cart = () => {
                                 <div className="flex gap-6">
                                     <div className="flex-shrink-0">
                                         <img
-                                            src={item.image}
-                                            alt={item.name}
+                                            src={item.product.image}
+                                            alt={item.product.name}
                                             className="w-32 h-32 object-cover rounded-xl"
                                         />
                                     </div>
                                     <div className="flex-grow">
                                         <div className="flex justify-between mb-2">
                                             <div>
-                                                <p className="text-xs font-semibold text-rony-orange uppercase tracking-wider mb-1">{item.category}</p>
-                                                <h3 className="text-xl font-bold text-rony-navy">{item.name}</h3>
+                                                <p className="text-xs font-semibold text-rony-orange uppercase tracking-wider mb-1">{item.product.category?.name || item.product.category}</p>
+                                                <h3 className="text-xl font-bold text-rony-navy">{item.product.name}</h3>
                                             </div>
                                             <button
-                                                onClick={() => removeFromCart(item.id)}
+                                                onClick={() => removeFromCart(item.product.id)}
                                                 className="text-gray-400 hover:text-red-500 transition-colors"
                                             >
                                                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -104,18 +104,18 @@ const Cart = () => {
                                                 </svg>
                                             </button>
                                         </div>
-                                        <p className="text-2xl font-bold text-rony-navy mb-4">{item.price}</p>
+                                        <p className="text-2xl font-bold text-rony-navy mb-4">${item.product.price}</p>
                                         <div className="flex items-center gap-4">
                                             <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                                                 <button
-                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                    onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                                                     className="px-4 py-2 hover:bg-gray-100 transition-colors"
                                                 >
                                                     −
                                                 </button>
                                                 <span className="px-6 py-2 font-medium">{item.quantity}</span>
                                                 <button
-                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                                                     className="px-4 py-2 hover:bg-gray-100 transition-colors"
                                                 >
                                                     +
@@ -123,7 +123,7 @@ const Cart = () => {
                                             </div>
                                             <span className="text-gray-600">
                                                 Subtotal: <span className="font-bold text-rony-navy">
-                                                    ${(parseFloat(item.price.replace('$', '')) * item.quantity).toFixed(2)}
+                                                    ${(parseFloat(item.product.price) * item.quantity).toFixed(2)}
                                                 </span>
                                             </span>
                                         </div>

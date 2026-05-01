@@ -236,7 +236,7 @@ const ShippingInfo = () => {
                                                 className="w-full h-32 object-cover rounded-lg mb-3"
                                             />
                                             <h4 className="font-bold text-rony-navy">{bagData.name}</h4>
-                                            <p className="text-sm text-gray-500 mt-1">{bagData.category}</p>
+                                            <p className="text-sm text-gray-500 mt-1">{bagData.category?.name || bagData.category}</p>
                                         </div>
                                         <div className="border-t border-gray-200 pt-4 space-y-2">
                                             <div className="flex justify-between text-sm">

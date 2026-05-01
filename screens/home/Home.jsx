@@ -1,17 +1,53 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../src/assets/ronycraft_logo.jpg';
-import { bags, categories } from '../../src/data/bags';
+import { bags as localBags, categories as localCategories } from '../../src/data/bags';
+import { getProducts, getCategories } from '../../src/api';
 
 const Home = () => {
     const navigate = useNavigate();
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [bags, setBags] = useState(localBags);
+    const [categories, setCategories] = useState(localCategories);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [productsRes, categoriesRes] = await Promise.all([
+                    getProducts(),
+                    getCategories()
+                ]);
+                const productsData = productsRes.data;
+                const categoriesData = categoriesRes.data;
+                
+                if (productsData && productsData.results) {
+                    setBags(productsData.results);
+                } else if (Array.isArray(productsData)) {
+                    setBags(productsData);
+                }
+
+                if (categoriesData && categoriesData.results) {
+                    setCategories([{ id: 'all', name: 'All Collection' }, ...categoriesData.results]);
+                } else if (Array.isArray(categoriesData)) {
+                    setCategories([{ id: 'all', name: 'All Collection' }, ...categoriesData]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch from backend, using local data', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const filteredBags = bags.filter(bag => {
-        const matchesCategory = activeCategory === 'all' || bag.category === activeCategory;
+        const matchesCategory = activeCategory === 'all' || 
+            (bag.category && (bag.category === activeCategory || bag.category.id === activeCategory));
         const matchesSearch = bag.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            bag.category.toLowerCase().includes(searchQuery.toLowerCase());
+            (bag.category_name && bag.category_name.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesCategory && matchesSearch;
     });
 
@@ -38,12 +74,24 @@ const Home = () => {
                         <button onClick={scrollToCategories} className="text-sm font-medium text-gray-600 hover:text-rony-navy transition-colors cursor-pointer">Categories</button>
                         <button onClick={() => navigate('/contact')} className="text-sm font-medium text-gray-600 hover:text-rony-navy transition-colors cursor-pointer">Contact Us</button>
                     </nav>
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="bg-rony-navy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
-                    >
-                        Login
-                    </button>
+                    {localStorage.getItem('token') ? (
+                        <button
+                            onClick={() => {
+                                localStorage.removeItem('token');
+                                window.location.reload();
+                            }}
+                            className="bg-red-500 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="bg-rony-navy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
+                        >
+                            Login
+                        </button>
+                    )}
                 </div>
             </header>
 
@@ -153,7 +201,7 @@ const Home = () => {
                                                 <span className="text-xs text-gray-400 line-through decoration-gray-400">{bag.originalPrice}</span>
                                             )}
                                         </div>
-                                        <p className="text-xs text-gray-500">{bag.category}</p>
+                                        <p className="text-xs text-gray-500">{bag.category_name || (bag.category && (bag.category.name || bag.category))}</p>
                                     </div>
                                 </div>
                             ))}
